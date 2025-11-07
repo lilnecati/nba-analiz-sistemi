@@ -45,4 +45,4 @@ Gelişmiş NBA oyuncu ve maç analiz sistemi. Oyuncu prop bet analizi ve maç al
 
 ## 🔧 Geliştirici
 
-NBA Analiz Sistemi - 2024
+NBA Analiz Sistemi - 2025

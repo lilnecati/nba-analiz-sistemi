@@ -40,8 +40,8 @@ def oyuncu_bul(isim):
 
 @api_call(
     cache_key_func=lambda oyuncu_id, sezon=None: f"season_stats_{oyuncu_id}_{sezon or 'current'}",
-    max_retries=3,
-    cache_duration_hours=6
+    max_retries=2,
+    cache_duration_hours=12
 )
 def sezon_istatistikleri_cek_optimized(oyuncu_id, sezon=None):
     """
