@@ -20,8 +20,8 @@ def create_fast_session():
     
     # Retry stratejisi
     retry_strategy = Retry(
-        total=2,  # Maksimum 2 deneme
-        backoff_factor=0.3,  # Hızlı backoff
+        total=1,  # Sadece 1 deneme - HIZLI
+        backoff_factor=0.1,  # Çok hızlı backoff
         status_forcelist=[429, 500, 502, 503, 504],
     )
     
@@ -34,8 +34,8 @@ def create_fast_session():
     session.mount("http://", adapter)
     session.mount("https://", adapter)
     
-    # Timeout ayarları
-    session.timeout = (5, 15)  # (connect, read) timeout
+    # Çok agresif timeout ayarları
+    session.timeout = (2, 8)  # (connect, read) timeout - ÇOK HIZLI
     
     return session
 

@@ -10,7 +10,7 @@ from cache_manager import cache
 class APIRateLimiter:
     """API rate limiting sınıfı"""
     
-    def __init__(self, min_interval=0.3):  # 0.6'dan 0.3'e düşürüldü
+    def __init__(self, min_interval=0.1):  # 0.3'den 0.1'e düşürüldü - ULTRA HIZLI
         """
         Args:
             min_interval: API çağrıları arasındaki minimum süre (saniye)
@@ -30,7 +30,7 @@ class APIRateLimiter:
 rate_limiter = APIRateLimiter()
 
 
-def with_retry(max_retries=2, delay=0.5, backoff=1.5):
+def with_retry(max_retries=1, delay=0.2, backoff=1.0):
     """
     Retry decorator - API hatalarında otomatik yeniden deneme
     
