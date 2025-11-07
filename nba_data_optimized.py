@@ -5,6 +5,8 @@ Cache, Retry ve Rate Limiting ile güçlendirilmiş
 
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats, playergamelog, commonplayerinfo
+import os
+os.environ['NBA_API_TIMEOUT'] = '10'  # 10 saniye timeout
 import pandas as pd
 from datetime import datetime
 from api_wrapper import api_call
@@ -70,10 +72,38 @@ def oyuncu_bul(isim):
         print("❌ Oyuncu bulunamadı!")
         return None
 
+def nba_api_headers_fix():
+    """NBA API headers düzelt"""
+    import nba_api.stats.endpoints as endpoints
+    
+    # NBA API için doğru headers
+    headers = {
+        'Host': 'stats.nba.com',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'x-nba-stats-origin': 'stats',
+        'x-nba-stats-token': 'true',
+        'Connection': 'keep-alive',
+        'Referer': 'https://stats.nba.com/',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+    }
+    
+    # Tüm endpoint'lere headers ekle
+    for attr_name in dir(endpoints):
+        attr = getattr(endpoints, attr_name)
+        if hasattr(attr, '_headers'):
+            attr._headers = headers
+
+# Headers'ı düzelt
+nba_api_headers_fix()
+
 def hizli_api_cagri(func, *args, **kwargs):
-    """Ultra hızlı API çağrısı - 15 saniye timeout"""
+    """Ultra hızlı API çağrısı - 10 saniye timeout"""
     try:
-        print(f"⚡ Hızlı API çağrısı başlatılıyor...")
+        print(f"⚡ Düzeltilmiş NBA API çağrısı...")
         
         # NBA API endpoint'ini direkt çağır
         result = func(*args, **kwargs)
