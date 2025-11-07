@@ -48,6 +48,13 @@ def with_retry(max_retries=3, delay=1, backoff=2):
             for attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
+                except (ValueError, SyntaxError, KeyError) as e:
+                    print(f"⚠️  API veri formatı hatası (deneme {attempt + 1}/{max_retries}): {str(e)}")
+                    last_exception = e
+                    if attempt < max_retries - 1:
+                        time.sleep(current_delay)
+                        current_delay *= backoff
+                    continue
                 except Exception as e:
                     last_exception = e
                     if attempt < max_retries - 1:
