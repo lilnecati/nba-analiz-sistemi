@@ -9,6 +9,38 @@ import pandas as pd
 from datetime import datetime
 from api_wrapper import api_call
 import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Hızlı HTTP session oluştur
+def create_fast_session():
+    """Hızlı HTTP session oluşturur"""
+    session = requests.Session()
+    
+    # Retry stratejisi
+    retry_strategy = Retry(
+        total=2,  # Maksimum 2 deneme
+        backoff_factor=0.3,  # Hızlı backoff
+        status_forcelist=[429, 500, 502, 503, 504],
+    )
+    
+    adapter = HTTPAdapter(
+        max_retries=retry_strategy,
+        pool_connections=10,
+        pool_maxsize=10
+    )
+    
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    # Timeout ayarları
+    session.timeout = (5, 15)  # (connect, read) timeout
+    
+    return session
+
+# Global fast session
+fast_session = create_fast_session()
 
 def guncel_sezon_bul():
     """Mevcut NBA sezonunu otomatik tespit eder"""
@@ -38,10 +70,29 @@ def oyuncu_bul(isim):
         print("❌ Oyuncu bulunamadı!")
         return None
 
+def hizli_api_cagri(func, *args, **kwargs):
+    """Ultra hızlı API çağrısı - 15 saniye timeout"""
+    try:
+        print(f"⚡ Hızlı API çağrısı başlatılıyor...")
+        
+        # NBA API endpoint'ini direkt çağır
+        result = func(*args, **kwargs)
+        
+        if hasattr(result, 'get_data_frames'):
+            df_list = result.get_data_frames()
+            if df_list and len(df_list) > 0:
+                return df_list[0]
+        
+        return None
+        
+    except Exception as e:
+        print(f"⚠️ API hatası: {str(e)[:100]}...")
+        return None
+
 @api_call(
     cache_key_func=lambda oyuncu_id, sezon=None: f"season_stats_{oyuncu_id}_{sezon or 'current'}",
-    max_retries=2,
-    cache_duration_hours=12
+    max_retries=1,  # Tek deneme
+    cache_duration_hours=24  # Uzun cache
 )
 def sezon_istatistikleri_cek_optimized(oyuncu_id, sezon=None):
     """
