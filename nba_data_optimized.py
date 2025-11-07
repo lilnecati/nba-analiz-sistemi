@@ -6,7 +6,7 @@ Cache, Retry ve Rate Limiting ile güçlendirilmiş
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats, playergamelog, commonplayerinfo
 import os
-os.environ['NBA_API_TIMEOUT'] = '10'  # 10 saniye timeout
+os.environ['NBA_API_TIMEOUT'] = '60'  # 60 saniye timeout - GERÇEK VERİ İÇİN
 import pandas as pd
 from datetime import datetime
 from api_wrapper import api_call
@@ -36,8 +36,8 @@ def create_fast_session():
     session.mount("http://", adapter)
     session.mount("https://", adapter)
     
-    # Çok agresif timeout ayarları
-    session.timeout = (2, 8)  # (connect, read) timeout - ÇOK HIZLI
+    # Gerçek NBA API için uzun timeout
+    session.timeout = (10, 60)  # (connect, read) timeout - GERÇEK VERİ İÇİN
     
     return session
 
